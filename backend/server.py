@@ -18,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger("movent")
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-GROQ_MODEL = "llama3-70b-8192"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
 
 # Initialise the official Groq SDK client once at startup.
