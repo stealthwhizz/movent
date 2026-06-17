@@ -1,0 +1,103 @@
+{
+  "theme_archetype": {
+    "name": "Swiss & High-Contrast (Linear-Style)",
+    "mode": "Light Theme ONLY",
+    "rationale": "Enterprise SaaS dashboard prioritizing clarity, focus, and rapid task completion. Matches problem statement constraints (no dark mode, Linear/Notion aesthetic)."
+  },
+  "typography": {
+    "font_family": "Inter",
+    "headings": {
+      "h1": "text-2xl sm:text-3xl font-semibold tracking-tight text-[#1A1916]",
+      "h2": "text-xl sm:text-2xl font-semibold tracking-tight text-[#1A1916]",
+      "h3": "text-lg font-medium text-[#1A1916]",
+      "card_title": "text-base font-semibold text-[#1A1916]"
+    },
+    "body": {
+      "default": "text-sm text-[#1A1916] leading-relaxed",
+      "muted": "text-sm text-[#7A7874]",
+      "label": "text-xs font-medium tracking-wide text-[#7A7874] uppercase"
+    }
+  },
+  "colors": {
+    "background": "#FAFAF8",
+    "card_background": "#FFFFFF",
+    "card_border": "#E8E6E1",
+    "primary": "#2D6BE4",
+    "danger": "#E84444",
+    "warning": "#F5A623",
+    "success": "#22A95B",
+    "text_primary": "#1A1916",
+    "text_muted": "#7A7874",
+    "recommendation_bg": "#EEF4FF"
+  },
+  "spacing_and_layout": {
+    "system": "Tailwind 8px scale (p-2, p-4, p-6, p-8)",
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "card_padding": "p-6",
+    "gap": "gap-6",
+    "border_radius": "rounded-lg"
+  },
+  "components": {
+    "cards": {
+      "base": "bg-[#FFFFFF] border border-[#E8E6E1] rounded-lg shadow-sm",
+      "hover": "hover:shadow-md transition-shadow duration-200",
+      "recommendation": "bg-[#EEF4FF] border border-[#2D6BE4]/20 rounded-lg p-6 shadow-sm"
+    },
+    "buttons": {
+      "primary": "bg-[#2D6BE4] text-white hover:bg-[#2D6BE4]/90 px-4 py-2 rounded-md font-medium text-sm transition-colors",
+      "secondary": "bg-white border border-[#E8E6E1] text-[#1A1916] hover:bg-[#FAFAF8] px-4 py-2 rounded-md font-medium text-sm transition-colors",
+      "danger": "bg-[#E84444] text-white hover:bg-[#E84444]/90 px-4 py-2 rounded-md font-medium text-sm transition-colors"
+    },
+    "badges": {
+      "high_risk": "bg-[#E84444]/10 text-[#E84444] px-2 py-1 rounded-md text-xs font-medium",
+      "medium_risk": "bg-[#F5A623]/10 text-[#F5A623] px-2 py-1 rounded-md text-xs font-medium",
+      "recovered": "bg-[#22A95B]/10 text-[#22A95B] px-2 py-1 rounded-md text-xs font-medium",
+      "ai_insight": "bg-[#2D6BE4]/10 text-[#2D6BE4] px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1"
+    },
+    "navigation": {
+      "topbar": "sticky top-0 z-50 bg-[#FAFAF8]/80 backdrop-blur-md border-b border-[#E8E6E1] h-16 flex items-center justify-between px-6"
+    }
+  },
+  "motion_and_interactions": {
+    "hover": "Subtle changes in box-shadow (shadow-sm to shadow-md) and border color for interactive elements.",
+    "active": "Scale down slightly (scale-95) for buttons.",
+    "transitions": "transition-all duration-200 ease-in-out"
+  },
+  "accessibility": {
+    "contrast": "All text combinations strictly meet or exceed WCAG AA standards using the defined palette.",
+    "focus": "focus:outline-none focus:ring-2 focus:ring-[#2D6BE4] focus:ring-offset-2 focus:ring-offset-[#FAFAF8]"
+  },
+  "image_urls": {
+    "avatars": [
+      {
+        "url": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3ODE2OTQ5MDl8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional headshot for customer avatar 1"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1629425733761-caae3b5f2e50?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHw0fHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3ODE2OTQ5MDl8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional headshot for customer avatar 2"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3ODE2OTQ5MDl8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional headshot for customer avatar 3"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1627161683077-e34782c24d81?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3ODE2OTQ5MDl8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional headshot for customer avatar 4"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "CRITICAL: The codebase uses .js and .jsx files, NOT .tsx. All your React components MUST be written in JavaScript.",
+    "Use standard HTML+Tailwind or Shadcn UI with severe overrides to match the ultra-minimalist Linear look.",
+    "Do NOT use dark mode. The app must solely exist in the Light theme.",
+    "Do NOT use gradients or purely decorative background blobs. Follow the #FAFAF8 background strictly.",
+    "Avoid heavy box-shadows. Use `shadow-sm` consistently to give cards a slight lift against the #FAFAF8 background.",
+    "Card borders must strictly be 1px solid #E8E6E1.",
+    "For the Inter font, ensure headers use tracking-tight to maintain a sophisticated, precision-tool aesthetic.",
+    "Use Lucide React (lucide-react) for a crisp, structural icon set.",
+    "All interactive elements MUST include `data-testid` attributes (e.g., `data-testid=\"customer-at-risk-card\"`).",
+    "Recommendation card must use the #EEF4FF background to stand out without relying on heavy borders.",
+    "Do NOT center align text or elements excessively. Keep layouts left-aligned, structured, and predictable."
+  ]
+}
