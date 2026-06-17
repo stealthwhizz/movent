@@ -46,3 +46,9 @@ Thumbs.db
 
 # Emergent platform (do not delete)
 # .emergent/
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
