@@ -33,7 +33,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
-      <Navbar currentTab={currentTab} onTabChange={handleTabChange} showBack={!!selectedCustomer} onBack={handleBack} />
+      <Navbar currentTab={currentTab} onTabChange={handleTabChange} showBack={!!selectedCustomer} />
       {selectedCustomer ? (
         <MomentIntelligence customer={selectedCustomer} onBack={handleBack} onApproval={handleApproval} />
       ) : currentTab === 'radar' ? (

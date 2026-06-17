@@ -41,10 +41,21 @@ const TOOLTIP_STYLE = {
 
 export default function ImpactCockpit({ sessionApprovals = [] }) {
   const [metrics, setMetrics] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    getDashboardMetrics().then(setMetrics).catch(console.error);
+    getDashboardMetrics().then(setMetrics).catch(() => setError(true));
   }, []);
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p data-testid="metrics-error" className="text-sm text-[#7A7874]">
+          Could not load metrics.
+        </p>
+      </div>
+    );
+  }
 
   if (!metrics) {
     return (

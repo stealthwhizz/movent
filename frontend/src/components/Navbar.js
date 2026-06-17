@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell } from 'lucide-react';
 
-export default function Navbar({ currentTab, onTabChange, showBack, onBack }) {
+export default function Navbar({ currentTab, onTabChange, showBack }) {
   const today = new Date().toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric'
   });
