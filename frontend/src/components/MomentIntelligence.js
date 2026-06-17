@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Mail, Globe, Smartphone, Target, Bell, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Globe, Smartphone, Target, Bell, CheckCircle, MinusCircle } from 'lucide-react';
 import { analyzeCustomerMoment, approveIntervention } from '../utils/api';
 
 const CHANNEL_CFG = {
@@ -41,10 +41,11 @@ function Shimmer() {
   );
 }
 
-export default function MomentIntelligence({ customer, onBack }) {
+export default function MomentIntelligence({ customer, onBack, onApproval }) {
   const [aiData, setAiData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [approved, setApproved] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function MomentIntelligence({ customer, onBack }) {
     setLoading(true);
     setAiData(null);
     setApproved(false);
+    setDismissed(false);
     analyzeCustomerMoment(customer)
       .then(data => { if (!cancelled) setAiData(data); })
       .catch(() => { if (!cancelled) setAiData(null); })
@@ -65,10 +67,18 @@ export default function MomentIntelligence({ customer, onBack }) {
     try {
       await approveIntervention(customer.id, aiData.recommendation.channel, aiData.recommendation.message_type);
       setApproved(true);
+      onApproval && onApproval(customer, aiData.recommendation);
       showToast('success', `Intervention approved via ${aiData.recommendation.channel.toUpperCase()}`);
     } catch {
       showToast('error', 'Failed to approve. Please try again.');
     }
+  };
+
+  // Dismiss records the decision without navigating away,
+  // so the user can still review the AI insight before going back.
+  const handleDismiss = () => {
+    setDismissed(true);
+    showToast('info', 'Recommendation dismissed. Customer stays on the radar.');
   };
 
   const showToast = (type, message) => {
@@ -87,10 +97,12 @@ export default function MomentIntelligence({ customer, onBack }) {
         <div
           data-testid="toast-notification"
           className={`fixed top-20 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all duration-300 ${
-            toast.type === 'success' ? 'bg-[#22A95B] text-white' : 'bg-[#E84444] text-white'
+            toast.type === 'success' ? 'bg-[#22A95B] text-white' :
+            toast.type === 'error'   ? 'bg-[#E84444] text-white' :
+                                       'bg-[#1A1916] text-white'
           }`}
         >
-          <CheckCircle size={15} />
+          {toast.type === 'success' ? <CheckCircle size={15} /> : <MinusCircle size={15} />}
           {toast.message}
         </div>
       )}
@@ -133,7 +145,6 @@ export default function MomentIntelligence({ customer, onBack }) {
               return (
                 <div key={idx} className="flex items-start">
                   <div className="flex flex-col items-center" style={{ width: '82px' }}>
-                    {/* Dot */}
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center relative"
                       style={{
@@ -149,14 +160,11 @@ export default function MomentIntelligence({ customer, onBack }) {
                         />
                       )}
                     </div>
-                    {/* Label */}
                     <span className="text-[9px] text-center text-[#1A1916] mt-1.5 leading-tight px-0.5">
                       {event.action}
                     </span>
-                    {/* Date */}
                     <span className="text-[9px] text-[#7A7874] mt-0.5">{event.date}</span>
                   </div>
-                  {/* Connector */}
                   {idx < reversedEvents.length - 1 && (
                     <div className="h-px w-3 bg-[#E8E6E1] mt-4 flex-shrink-0" />
                   )}
@@ -242,22 +250,29 @@ export default function MomentIntelligence({ customer, onBack }) {
                       <CheckCircle size={14} />
                       Approved
                     </div>
+                  ) : dismissed ? (
+                    <div data-testid="dismissed-state"
+                      className="flex items-center gap-2 px-4 py-2 bg-[#F5F4F1] text-[#7A7874] rounded-md text-sm font-medium">
+                      <MinusCircle size={14} />
+                      Dismissed
+                    </div>
                   ) : (
-                    <button
-                      data-testid="approve-intervention-btn"
-                      onClick={handleApprove}
-                      className="px-4 py-2 bg-[#2D6BE4] text-white rounded-md text-sm font-medium hover:bg-[#255fc0] transition-colors"
-                    >
-                      Approve Intervention
-                    </button>
-                  )}
-                  {!approved && (
-                    <button
-                      data-testid="dismiss-btn"
-                      className="px-4 py-2 border border-[#E8E6E1] text-[#7A7874] rounded-md text-sm font-medium hover:bg-[#F5F4F1] transition-colors"
-                    >
-                      Dismiss
-                    </button>
+                    <>
+                      <button
+                        data-testid="approve-intervention-btn"
+                        onClick={handleApprove}
+                        className="px-4 py-2 bg-[#2D6BE4] text-white rounded-md text-sm font-medium hover:bg-[#255fc0] transition-colors"
+                      >
+                        Approve Intervention
+                      </button>
+                      <button
+                        data-testid="dismiss-btn"
+                        onClick={handleDismiss}
+                        className="px-4 py-2 border border-[#E8E6E1] text-[#7A7874] rounded-md text-sm font-medium hover:bg-[#F5F4F1] transition-colors"
+                      >
+                        Dismiss
+                      </button>
+                    </>
                   )}
                 </div>
               </>
@@ -269,3 +284,4 @@ export default function MomentIntelligence({ customer, onBack }) {
     </main>
   );
 }
+

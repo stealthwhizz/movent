@@ -1,4 +1,4 @@
-# Python
+# ─── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
@@ -18,12 +18,21 @@ build/
 .coverage
 htmlcov/
 
-# Environment
+# ─── Secrets — real .env files only ────────────────────────────────────────────
 .env
+backend/.env
+frontend/.env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.production
 
-# Node / React
+# .env.example files are safe to commit (they contain no real secrets)
+!.env.example
+!**/.env.example
+
+# ─── Node / React ───────────────────────────────────────────────────────────────
 node_modules/
 /frontend/build/
 /frontend/.pnp
@@ -33,7 +42,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# IDE
+# ─── IDE ────────────────────────────────────────────────────────────────────────
 .idea/
 .vscode/
 *.swp
@@ -41,13 +50,17 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Logs
+# ─── Logs ───────────────────────────────────────────────────────────────────────
 *.log
 
-# Emergent platform (do not delete)
-# .emergent/
-.env.*
-*.env
+# ─── Emergent platform internals — not for public repo ─────────────────────────
+.emergent/
+memory/
+test_reports/
+design_guidelines.json
+.gitconfig
+
+# ─── Other secrets ──────────────────────────────────────────────────────────────
 credentials.json
 *.pem
 *.key

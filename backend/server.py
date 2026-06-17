@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 import requests
 from datetime import datetime, timezone
 from typing import List
@@ -10,17 +11,36 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
+)
+logger = logging.getLogger("movent")
+
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama3-70b-8192"
 OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
 
+# Initialise the official Groq SDK client once at startup.
+# The client does not validate the key until an actual API call is made.
+try:
+    from groq import Groq as _GroqSDK
+    _groq_client = _GroqSDK(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+    if _groq_client:
+        logger.info("Groq SDK client initialised (model: %s)", GROQ_MODEL)
+    else:
+        logger.warning("GROQ_API_KEY not set — Groq provider disabled")
+except ImportError:
+    _groq_client = None
+    logger.warning("groq package not installed — Groq provider disabled")
+
 app = FastAPI(title="Movent - Customer Moment Engine API")
 
+# allow_credentials=True is incompatible with allow_origins=["*"].
+# This app uses no cookies or session tokens, so credentials are not needed.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -76,33 +96,26 @@ Rules:
 
 
 def call_groq(prompt: str) -> dict:
-    if not GROQ_API_KEY:
-        raise ValueError("No GROQ_API_KEY configured")
+    """Call Groq via the official SDK. Raises on any failure."""
+    if _groq_client is None:
+        raise RuntimeError("Groq client unavailable — check GROQ_API_KEY")
 
-    response = requests.post(
-        GROQ_API_URL,
-        headers={
-            "Authorization": f"Bearer {GROQ_API_KEY}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "model": GROQ_MODEL,
-            "messages": [{"role": "user", "content": prompt}],
-            "response_format": {"type": "json_object"},
-            "temperature": 0.3,
-            "max_tokens": 500
-        },
-        timeout=15
+    completion = _groq_client.chat.completions.create(
+        model=GROQ_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"},
+        temperature=0.3,
+        max_tokens=500,
     )
-    response.raise_for_status()
-    data = response.json()
-    content = data["choices"][0]["message"]["content"]
+    content = completion.choices[0].message.content
     result = json.loads(content)
     result["source"] = "groq"
+    logger.info("Groq responded successfully")
     return result
 
 
 def call_ollama(prompt: str) -> dict:
+    """Call local Ollama via its OpenAI-compatible endpoint. Raises on any failure."""
     response = requests.post(
         OLLAMA_URL,
         json={
@@ -120,6 +133,7 @@ def call_ollama(prompt: str) -> dict:
     content = data["choices"][0]["message"]["content"]
     result = json.loads(content)
     result["source"] = "ollama"
+    logger.info("Ollama responded successfully")
     return result
 
 
@@ -189,14 +203,15 @@ def analyze_moment(request: AnalyzeMomentRequest):
 
     try:
         return call_groq(prompt)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Groq provider failed: %s: %s", type(e).__name__, e)
 
     try:
         return call_ollama(prompt)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Ollama provider failed: %s: %s", type(e).__name__, e)
 
+    logger.info("Both providers failed — returning mock response for segment '%s'", request.segment)
     return get_mock_response(request.customer_name, request.segment, request.risk_score)
 
 

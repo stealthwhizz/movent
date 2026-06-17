@@ -39,7 +39,7 @@ const TOOLTIP_STYLE = {
   color: '#1A1916',
 };
 
-export default function ImpactCockpit() {
+export default function ImpactCockpit({ sessionApprovals = [] }) {
   const [metrics, setMetrics] = useState(null);
 
   useEffect(() => {
@@ -132,6 +132,23 @@ export default function ImpactCockpit() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F0EFEC]">
+              {/* Session approvals appear at the top in real-time */}
+              {sessionApprovals.map((row, i) => (
+                <tr key={`session-${i}`} data-testid={`log-row-session-${i}`} className="hover:bg-[#FAFAF8] transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-[#1A1916] whitespace-nowrap">
+                    {row.customer}
+                    <span className="ml-2 text-[10px] font-medium bg-[#EEF4FF] text-[#2D6BE4] px-1.5 py-0.5 rounded">new</span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-[#7A7874]">{row.signal}</td>
+                  <td className="px-6 py-4 text-sm text-[#7A7874] whitespace-nowrap">{row.channel}</td>
+                  <td className="px-6 py-4">
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${OUTCOME_STYLES[row.outcome] || OUTCOME_STYLES['No Response']}`}>
+                      {row.outcome}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {/* Baseline log from API */}
               {metrics.intervention_log.map((row, i) => (
                 <tr key={i} data-testid={`log-row-${i}`} className="hover:bg-[#FAFAF8] transition-colors">
                   <td className="px-6 py-4 text-sm font-medium text-[#1A1916] whitespace-nowrap">{row.customer}</td>
