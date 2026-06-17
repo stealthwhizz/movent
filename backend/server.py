@@ -83,7 +83,8 @@ Return ONLY this JSON (no markdown, no extra text):
     "channel": "email",
     "message_type": "specific message type",
     "urgency": "high",
-    "confidence": 85
+    "confidence": 85,
+    "send_window": "Within 2 hours"
   }}
 }}
 
@@ -92,7 +93,11 @@ Rules:
 - channel: one of exactly: email, web, app, paid, push
 - urgency: one of exactly: high, medium, low
 - confidence: integer 60-95
-- urgency should be high if risk>=75, medium if 40-74, low if <40"""
+- urgency should be high if risk>=75, medium if 40-74, low if <40
+- send_window: how soon to send — based on urgency:
+  high urgency: Within 2 hours, or Today before 6pm
+  medium urgency: Within 24 hours, or Next 48 hours
+  low urgency: Next 48 hours, or Next 3-4 weeks"""
 
 
 def call_groq(prompt: str) -> dict:
@@ -140,43 +145,43 @@ def call_ollama(prompt: str) -> dict:
 MOCK_RESPONSES = {
     "High-Value Lapsed": {
         "explanation": "This customer has abandoned a cart item and failed to respond to 4 consecutive email sends over the past week, indicating severe email channel fatigue combined with high purchase intent. The 7-day silence following clear cart engagement is a strong pre-churn signal in the high-value segment. An alternative channel intervention through push is critical to recovery before the purchase intent window closes entirely.",
-        "recommendation": {"channel": "push", "message_type": "Exclusive Win-Back Offer", "urgency": "high", "confidence": 87}
+        "recommendation": {"channel": "push", "message_type": "Exclusive Win-Back Offer", "urgency": "high", "confidence": 87, "send_window": "Within 2 hours"}
     },
     "Repeat Buyer": {
         "explanation": "This repeat buyer's 21-day purchase gap significantly exceeds their historical repurchase cadence, and the absence of browse or wishlist activity signals a shift in engagement intent. Without a re-engagement touchpoint in the past three weeks, the risk of permanent churn is elevated. A personalized replenishment reminder anchored to their last purchase category is the highest-probability reactivation lever.",
-        "recommendation": {"channel": "email", "message_type": "Personalized Replenishment Reminder", "urgency": "medium", "confidence": 78}
+        "recommendation": {"channel": "email", "message_type": "Personalized Replenishment Reminder", "urgency": "medium", "confidence": 78, "send_window": "Within 24 hours"}
     },
     "New User": {
         "explanation": "This customer installed the app and engaged briefly on day 1 but has never returned — a classic onboarding abandonment pattern that predicts uninstall within 72 hours. Without a timely intervention, the probability of permanent app churn exceeds 80% based on cohort benchmarks for this segment. An in-app re-engagement push highlighting a clear first value moment has 3x the recovery rate of email for day-1 drop-offs.",
-        "recommendation": {"channel": "push", "message_type": "Onboarding Completion Nudge", "urgency": "high", "confidence": 82}
+        "recommendation": {"channel": "push", "message_type": "Onboarding Completion Nudge", "urgency": "high", "confidence": 82, "send_window": "Within 2 hours"}
     },
     "Browse Intent": {
         "explanation": "This customer has shown high browse frequency with 8+ sessions this week and wishlist additions but has not converted, indicating a hesitation pattern likely driven by price sensitivity or competitor comparison. The wishlist signal is a strong purchase intent marker that has not been activated by current outreach. A timely limited-time offer on their saved items could bridge the intent-to-purchase gap before attention shifts.",
-        "recommendation": {"channel": "email", "message_type": "Wishlist Price Drop Alert", "urgency": "medium", "confidence": 74}
+        "recommendation": {"channel": "email", "message_type": "Wishlist Price Drop Alert", "urgency": "medium", "confidence": 74, "send_window": "Today before 6pm"}
     },
     "Email Fatigued": {
         "explanation": "This customer explicitly unsubscribed from email but continues to receive paid ad exposure, creating a negative brand experience that accelerates churn risk. The combination of unsubscribe action with continued retargeting is creating regulatory risk and pushing a recoverable customer toward permanent disengagement. Shifting to a consent-based web retargeting strategy with a suppressed email flag is the recommended path.",
-        "recommendation": {"channel": "web", "message_type": "Preference Center Re-engagement", "urgency": "high", "confidence": 79}
+        "recommendation": {"channel": "web", "message_type": "Preference Center Re-engagement", "urgency": "high", "confidence": 79, "send_window": "Within 24 hours"}
     },
     "Seasonal Buyer": {
         "explanation": "This seasonal buyer's last purchase aligns with a December calendar event, and their 4-month inactivity falls within the expected inter-purchase interval for this segment. However, the approach of a new seasonal repurchase window makes this an optimal pre-activation moment. A category-specific preview campaign delivered 3-4 weeks before their purchase anniversary has the highest reactivation probability.",
-        "recommendation": {"channel": "email", "message_type": "Seasonal Preview Campaign", "urgency": "medium", "confidence": 68}
+        "recommendation": {"channel": "email", "message_type": "Seasonal Preview Campaign", "urgency": "medium", "confidence": 68, "send_window": "Next 3–4 weeks"}
     },
     "Loyal Customer": {
         "explanation": "This loyal customer's 40% drop in email open rate over one month is a leading churn indicator that typically precedes full disengagement by 4-8 weeks. Despite strong historical engagement, the declining attention metrics suggest the current content cadence is no longer resonating with this customer. A preference survey combined with reduced send frequency can stabilize engagement before active disengagement sets in.",
-        "recommendation": {"channel": "email", "message_type": "Loyalty Preference Survey", "urgency": "low", "confidence": 72}
+        "recommendation": {"channel": "email", "message_type": "Loyalty Preference Survey", "urgency": "low", "confidence": 72, "send_window": "Next 48 hours"}
     },
     "Trial User": {
         "explanation": "This trial user is in the critical final 48-hour window before trial expiry with no upgrade action taken — the highest-risk conversion moment in the entire trial lifecycle. The absence of pricing page exploration signals either insufficient feature discovery or a perceived value mismatch that has not been addressed by onboarding emails. An immediate in-app intervention showcasing unused premium features can increase trial-to-paid conversion by up to 35%.",
-        "recommendation": {"channel": "app", "message_type": "Trial Expiry Feature Showcase", "urgency": "high", "confidence": 89}
+        "recommendation": {"channel": "app", "message_type": "Trial Expiry Feature Showcase", "urgency": "high", "confidence": 89, "send_window": "Within 2 hours"}
     },
     "Re-engaged": {
         "explanation": "This customer was successfully reactivated after a prior disengagement period, demonstrating high responsiveness to push intervention, and their recent purchase confirms the reactivation worked. However, early re-engaged customers show a 28% relapse rate within 30 days without a follow-up retention touchpoint. A post-purchase satisfaction check-in will reinforce the relationship and surface any friction before it becomes a retention issue.",
-        "recommendation": {"channel": "push", "message_type": "Post-Purchase Check-In", "urgency": "low", "confidence": 65}
+        "recommendation": {"channel": "push", "message_type": "Post-Purchase Check-In", "urgency": "low", "confidence": 65, "send_window": "Next 48 hours"}
     },
     "High Intent": {
         "explanation": "This customer is actively reading product reviews and comparing competitor options, placing them in the final evaluation phase of the purchase journey — the most time-sensitive intervention window. The competitor comparison behavior indicates they have not yet committed, meaning a well-timed value-differentiation message could capture the conversion. A direct competitive positioning message delivered within the next 12 hours has the highest probability for this behavioral pattern.",
-        "recommendation": {"channel": "web", "message_type": "Competitive Differentiation Message", "urgency": "medium", "confidence": 76}
+        "recommendation": {"channel": "web", "message_type": "Competitive Differentiation Message", "urgency": "medium", "confidence": 76, "send_window": "Within 12 hours"}
     }
 }
 
@@ -190,9 +195,10 @@ def get_mock_response(customer_name: str, segment: str, risk_score: int) -> dict
             "source": "mock"
         }
     urgency = "high" if risk_score >= 75 else "medium" if risk_score >= 40 else "low"
+    send_window = "Within 2 hours" if risk_score >= 75 else "Within 24 hours" if risk_score >= 40 else "Next 48 hours"
     return {
         "explanation": f"{customer_name} is showing behavioral patterns consistent with pre-churn disengagement across multiple channels. The combination of reduced activity frequency and non-responsiveness to recent outreach indicates declining intent. An immediate cross-channel intervention is recommended before this customer is permanently lost.",
-        "recommendation": {"channel": "email", "message_type": "Re-engagement Campaign", "urgency": urgency, "confidence": 70},
+        "recommendation": {"channel": "email", "message_type": "Re-engagement Campaign", "urgency": urgency, "confidence": 70, "send_window": send_window},
         "source": "mock"
     }
 

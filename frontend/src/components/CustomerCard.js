@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Globe, Smartphone, Target, Bell } from 'lucide-react';
+import { Mail, Globe, Smartphone, Target, Bell, Clock } from 'lucide-react';
 
 const CHANNELS = [
   { key: 'email', icon: Mail, label: 'Email', activeColor: '#2D6BE4' },
@@ -16,6 +16,8 @@ function getRiskPill(risk) {
 }
 
 export default function CustomerCard({ customer, onViewMoment }) {
+  const latestDate = customer.events[0]?.date;
+
   return (
     <div
       data-testid={`customer-card-${customer.id}`}
@@ -36,7 +38,13 @@ export default function CustomerCard({ customer, onViewMoment }) {
               {customer.segment}
             </span>
           </div>
-          <p className="text-xs text-[#7A7874] mb-2.5 truncate">{customer.signal}</p>
+          <p className="text-xs text-[#7A7874] truncate">{customer.signal}</p>
+          {latestDate && (
+            <p className="flex items-center gap-1 text-[10px] text-[#7A7874] mt-1 mb-1.5" data-testid={`last-activity-${customer.id}`}>
+              <Clock size={9} />
+              Last signal: {latestDate}
+            </p>
+          )}
 
           {/* Channel icons */}
           <div className="flex items-center gap-1.5">
@@ -47,9 +55,7 @@ export default function CustomerCard({ customer, onViewMoment }) {
                   key={key}
                   title={`${label}${isActive ? ' — active last 7d' : ''}`}
                   className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-                  style={{
-                    backgroundColor: isActive ? `${activeColor}18` : '#F5F4F1',
-                  }}
+                  style={{ backgroundColor: isActive ? `${activeColor}18` : '#F5F4F1' }}
                 >
                   <Icon size={11} style={{ color: isActive ? activeColor : '#C8C5BF' }} />
                 </div>
@@ -79,3 +85,4 @@ export default function CustomerCard({ customer, onViewMoment }) {
     </div>
   );
 }
+

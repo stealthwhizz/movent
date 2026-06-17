@@ -3,33 +3,54 @@ import { CUSTOMERS } from '../data/customers';
 import CustomerCard from './CustomerCard';
 import { Activity, Zap, AlertTriangle, TrendingUp } from 'lucide-react';
 
-const FILTERS = ['All', 'High Risk', 'Medium Risk', 'Recovered'];
+const FILTERS = ['All', 'High Risk', 'Medium Risk', 'Low Risk'];
 
-const STAT_CARDS = [
-  { label: 'Moments Detected', value: '10', icon: Activity, color: '#2D6BE4', testId: 'moments-detected' },
-  { label: 'Interventions Triggered', value: '7', icon: Zap, color: '#F5A623', testId: 'interventions-triggered' },
-  { label: 'Customers at Risk', value: '8', icon: AlertTriangle, color: '#E84444', testId: 'customers-at-risk' },
-  { label: 'Avg Risk Score', value: '62', icon: TrendingUp, color: '#22A95B', testId: 'avg-risk-score' },
-];
+// Sort once at module level — highest risk first
+const SORTED_CUSTOMERS = [...CUSTOMERS].sort((a, b) => b.risk - a.risk);
+
+// Baseline stats derived from the dataset
+const MOMENTS_DETECTED = CUSTOMERS.length;
+const CUSTOMERS_AT_RISK = CUSTOMERS.filter(c => c.risk >= 40).length;
+const AVG_RISK_SCORE = Math.round(CUSTOMERS.reduce((s, c) => s + c.risk, 0) / CUSTOMERS.length);
+const INTERVENTIONS_BASELINE = 7; // pre-session interventions in the dataset
 
 function filterCustomers(customers, filter) {
   if (filter === 'All') return customers;
   if (filter === 'High Risk') return customers.filter(c => c.risk >= 75);
   if (filter === 'Medium Risk') return customers.filter(c => c.risk >= 40 && c.risk < 75);
-  if (filter === 'Recovered') return customers.filter(c => c.risk < 40);
+  if (filter === 'Low Risk') return customers.filter(c => c.risk < 40);
   return customers;
 }
 
-export default function MomentRadar({ onViewMoment }) {
+export default function MomentRadar({ onViewMoment, sessionApprovalsCount = 0 }) {
   const [activeFilter, setActiveFilter] = useState('All');
-  const filtered = filterCustomers(CUSTOMERS, activeFilter);
+  const filtered = filterCustomers(SORTED_CUSTOMERS, activeFilter);
+
+  const statCards = [
+    { label: 'Moments Detected', value: MOMENTS_DETECTED, icon: Activity, color: '#2D6BE4', testId: 'moments-detected' },
+    { label: 'Interventions Triggered', value: INTERVENTIONS_BASELINE + sessionApprovalsCount, icon: Zap, color: '#F5A623', testId: 'interventions-triggered' },
+    { label: 'Customers at Risk', value: CUSTOMERS_AT_RISK, icon: AlertTriangle, color: '#E84444', testId: 'customers-at-risk' },
+    { label: 'Avg Risk Score', value: AVG_RISK_SCORE, icon: TrendingUp, color: '#22A95B', testId: 'avg-risk-score' },
+  ];
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+      {/* Page heading with Live indicator */}
+      <div className="flex items-center gap-3 mb-6">
+        <h1 className="text-xl font-semibold tracking-tight text-[#1A1916]">Moment Radar</h1>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-[#22A95B]">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22A95B] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#22A95B]"></span>
+          </span>
+          Live
+        </span>
+      </div>
+
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {STAT_CARDS.map(({ label, value, icon: Icon, color, testId }) => (
+        {statCards.map(({ label, value, icon: Icon, color, testId }) => (
           <div
             key={label}
             data-testid={`stat-card-${testId}`}

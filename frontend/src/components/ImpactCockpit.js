@@ -77,7 +77,7 @@ export default function ImpactCockpit({ sessionApprovals = [] }) {
 
   const kpiCards = [
     { label: 'Moments Detected', value: metrics.moments_detected, trend: metrics.trends.moments_detected, icon: Activity, color: '#2D6BE4' },
-    { label: 'Interventions Approved', value: metrics.interventions_approved, trend: metrics.trends.interventions_approved, icon: CheckSquare, color: '#F5A623' },
+    { label: 'Interventions Approved', value: metrics.interventions_approved + sessionApprovals.length, trend: metrics.trends.interventions_approved, icon: CheckSquare, color: '#F5A623' },
     { label: 'Churn Prevented', value: metrics.churn_prevented, trend: metrics.trends.churn_prevented, icon: TrendingDown, color: '#22A95B' },
     { label: 'Recovery Rate', value: `${metrics.recovery_rate}%`, trend: metrics.trends.recovery_rate, icon: BarChart2, color: '#7B5CF5' },
   ];

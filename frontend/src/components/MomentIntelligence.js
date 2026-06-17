@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Mail, Globe, Smartphone, Target, Bell, CheckCircle, MinusCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Globe, Smartphone, Target, Bell, CheckCircle, MinusCircle, Clock } from 'lucide-react';
 import { analyzeCustomerMoment, approveIntervention } from '../utils/api';
 
 const CHANNEL_CFG = {
@@ -8,6 +8,14 @@ const CHANNEL_CFG = {
   app:   { icon: Smartphone, color: '#22A95B', label: 'App' },
   paid:  { icon: Target, color: '#F5A623', label: 'Paid' },
   push:  { icon: Bell, color: '#E84444', label: 'Push' },
+};
+
+const CHANNEL_RATIONALE = {
+  email: 'Historically strong email engagement for this segment; best low-friction follow-up channel.',
+  web:   'Recent browsing activity detected; on-site messaging is most contextual right now.',
+  app:   'Active in-app sessions confirm this channel has the highest immediate reach for this user.',
+  paid:  'Strong purchase intent signals detected; retargeting maximises visibility at decision time.',
+  push:  'Email channel fatigue detected; push delivers higher recovery rate for this disengagement pattern.',
 };
 
 function getRiskPill(risk) {
@@ -209,7 +217,7 @@ export default function MomentIntelligence({ customer, onBack, onApproval }) {
             return (
               <>
                 {/* Channel row */}
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${chCfg.color}18` }}>
                     <ChIcon size={16} style={{ color: chCfg.color }} />
@@ -217,6 +225,12 @@ export default function MomentIntelligence({ customer, onBack, onApproval }) {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#1A1916] capitalize">{rec.channel}</p>
                     <p className="text-xs text-[#7A7874] truncate">{rec.message_type}</p>
+                    {rec.send_window && (
+                      <p className="flex items-center gap-1 text-[10px] text-[#7A7874] mt-0.5" data-testid="send-window">
+                        <Clock size={9} />
+                        {rec.send_window}
+                      </p>
+                    )}
                   </div>
                   <span data-testid="urgency-badge" className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${
                     rec.urgency === 'high'   ? 'bg-[#FEF2F2] text-[#E84444]' :
@@ -226,6 +240,13 @@ export default function MomentIntelligence({ customer, onBack, onApproval }) {
                     {rec.urgency} urgency
                   </span>
                 </div>
+
+                {/* Why this channel */}
+                {CHANNEL_RATIONALE[rec.channel] && (
+                  <p className="text-[11px] text-[#7A7874] italic mb-4 leading-relaxed" data-testid="channel-rationale">
+                    {CHANNEL_RATIONALE[rec.channel]}
+                  </p>
+                )}
 
                 {/* Confidence bar */}
                 <div className="mb-5">

@@ -37,7 +37,7 @@ export default function App() {
       {selectedCustomer ? (
         <MomentIntelligence customer={selectedCustomer} onBack={handleBack} onApproval={handleApproval} />
       ) : currentTab === 'radar' ? (
-        <MomentRadar onViewMoment={handleViewMoment} />
+        <MomentRadar onViewMoment={handleViewMoment} sessionApprovalsCount={sessionApprovals.length} />
       ) : (
         <ImpactCockpit sessionApprovals={sessionApprovals} />
       )}
